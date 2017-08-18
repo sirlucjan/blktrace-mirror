@@ -57,7 +57,7 @@ struct io *rb_find_sec(struct rb_root *root, __u64 sec)
 		__iop = rb_entry(n, struct io, rb_node);
 		if (sec < BIT_START(__iop))
 			n = n->rb_left;
-		else if (sec >= BIT_END(__iop))
+		else if (sec > BIT_START(__iop))
 			n = n->rb_right;
 		else
 			return __iop;
@@ -82,7 +82,7 @@ void rb_foreach(struct rb_node *n, struct io *iop,
 		}
 		if (iop_s < this_s)
 			rb_foreach(n->rb_left, iop, fnc, head);
-		if (this_e < iop_e)
+		if ((this_e < iop_e) || (this_s < iop_s))
 			rb_foreach(n->rb_right, iop, fnc, head);
 	}
 }
