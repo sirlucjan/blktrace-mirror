@@ -1066,9 +1066,10 @@ static void close_client_connections(void)
 	}
 }
 
-static void setup_buts(void)
+static int setup_buts(void)
 {
 	struct list_head *p;
+	int ret = 0;
 
 	__list_for_each(p, &devpaths) {
 		struct blk_user_trace_setup buts;
@@ -1086,10 +1087,14 @@ static void setup_buts(void)
 				free(dpp->stats);
 			dpp->stats = calloc(dpp->ncpus, sizeof(*dpp->stats));
 			memset(dpp->stats, 0, dpp->ncpus * sizeof(*dpp->stats));
-		} else
+		} else {
 			fprintf(stderr, "BLKTRACESETUP(2) %s failed: %d/%s\n",
 				dpp->path, errno, strerror(errno));
+			ret++;
+		}
 	}
+
+	return ret;
 }
 
 static void start_buts(void)
@@ -2676,7 +2681,8 @@ static int run_tracers(void)
 	if (net_mode == Net_client)
 		printf("blktrace: connecting to %s\n", hostname);
 
-	setup_buts();
+	if (setup_buts())
+		return 1;
 
 	if (use_tracer_devpaths()) {
 		if (setup_tracer_devpaths())
