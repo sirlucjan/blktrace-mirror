@@ -108,7 +108,7 @@ void dip_exit(void)
 static inline FILE *open_pit(struct d_info *dip)
 {
 	FILE *fp;
-	char str[256];
+	char str[272];
 
 	sprintf(str, "%s_pit.dat", dip->dip_name);
 	if ((fp = my_fopen(str, "w")) == NULL)
