@@ -112,6 +112,7 @@ struct devpath {
 	struct cl_host *ch;
 	u32 cl_id;
 	time_t cl_connect_time;
+	int setup_done;	/* ioctl BLKTRACESETUP done */
 	struct io_info *ios;
 };
 
@@ -1083,6 +1084,7 @@ static int setup_buts(void)
 		if (ioctl(dpp->fd, BLKTRACESETUP, &buts) >= 0) {
 			dpp->ncpus = max_cpus;
 			dpp->buts_name = strdup(buts.name);
+			dpp->setup_done = 1;
 			if (dpp->stats)
 				free(dpp->stats);
 			dpp->stats = calloc(dpp->ncpus, sizeof(*dpp->stats));
@@ -1285,7 +1287,8 @@ static void rel_devpaths(void)
 		struct devpath *dpp = list_entry(p, struct devpath, head);
 
 		list_del(&dpp->head);
-		__stop_trace(dpp->fd);
+		if (dpp->setup_done)
+			__stop_trace(dpp->fd);
 		close(dpp->fd);
 
 		if (dpp->heads)
