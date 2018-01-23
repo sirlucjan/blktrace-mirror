@@ -26,19 +26,19 @@ btreplay/btreplay:
 	$(CC) -o $*.o -c $(ALL_CFLAGS) $<
 
 blkparse: blkparse.o blkparse_fmt.o rbtree.o act_mask.o
-	$(CC) $(ALL_CFLAGS) -o $@ $(filter %.o,$^)
+	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(filter %.o,$^)
 
 blktrace: blktrace.o act_mask.o
-	$(CC) $(ALL_CFLAGS) -o $@ $(filter %.o,$^) $(LIBS)
+	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(filter %.o,$^) $(LIBS)
 
 verify_blkparse: verify_blkparse.o
-	$(CC) $(ALL_CFLAGS) -o $@ $(filter %.o,$^)
+	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(filter %.o,$^)
 
 blkrawverify: blkrawverify.o
-	$(CC) $(ALL_CFLAGS) -o $@ $(filter %.o,$^)
+	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(filter %.o,$^)
 
 blkiomon: blkiomon.o rbtree.o
-	$(CC) $(ALL_CFLAGS) -o $@ $(filter %.o,$^) $(LIBS) -lrt
+	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(filter %.o,$^) $(LIBS) -lrt
 
 $(PROGS): | depend
 

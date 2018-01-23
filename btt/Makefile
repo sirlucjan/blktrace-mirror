@@ -38,7 +38,7 @@ clean: docsclean
 	$(CC) $(CFLAGS) -c -o $*.o $<
 
 btt: $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $(filter %.o,$^) $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(filter %.o,$^) $(LIBS)
 
 ifneq ($(wildcard .depend),)
 include .depend

@@ -32,10 +32,10 @@ clean: docsclean
 	$(CC) $(CFLAGS) -c -o $*.o $<
 
 btrecord: btrecord.o
-	$(CC) $(CFLAGS) -o $@ $(filter %.o,$^)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(filter %.o,$^)
 
 btreplay: btreplay.o
-	$(CC) $(CFLAGS) -o $@ $(filter %.o,$^) $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(filter %.o,$^) $(LIBS)
 
 depend:
 	@$(CC) -MM $(CFLAGS) *.c 1> .depend
