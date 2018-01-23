@@ -4,23 +4,19 @@ ALL_CFLAGS = $(CFLAGS) -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
 PROGS	= blkparse blktrace verify_blkparse blkrawverify blkiomon
 LIBS	= -lpthread
 SCRIPTS	= btrace
+SUBDIRS = btreplay btt iowatcher
 
-ALL = $(PROGS) $(SCRIPTS) btt/btt btreplay/btrecord btreplay/btreplay \
+ALL = $(PROGS) $(SCRIPTS)
+INSTALL_ALL = $(ALL) btt/btt btreplay/btrecord btreplay/btreplay \
       btt/bno_plot.py iowatcher/iowatcher
 
-all: $(ALL)
+all: $(ALL) $(SUBDIRS)
 
-btt/btt:
-	$(MAKE) -C btt
-
-iowatcher/iowatcher:
-	$(MAKE) -C iowatcher
-
-btreplay/btrecord:
-	$(MAKE) -C btreplay
-
-btreplay/btreplay:
-	$(MAKE) -C btreplay
+# We always descend into subdirs because they contain their own dependency
+# information which we don't track in this top level Makefile.
+$(SUBDIRS):
+	$(MAKE) -C $@
+.PHONY: $(SUBDIRS)
 
 %.o: %.c
 	$(CC) -o $*.o -c $(ALL_CFLAGS) $<
@@ -85,7 +81,7 @@ install: all
 	$(INSTALL) -m 755 -d $(DESTDIR)$(bindir)
 	$(INSTALL) -m 755 -d $(DESTDIR)$(mandir)/man1
 	$(INSTALL) -m 755 -d $(DESTDIR)$(mandir)/man8
-	$(INSTALL) -m 755 $(ALL) $(DESTDIR)$(bindir)
+	$(INSTALL) -m 755 $(INSTALL_ALL) $(DESTDIR)$(bindir)
 	$(INSTALL) -m 644 doc/*.1 $(DESTDIR)$(mandir)/man1
 	$(INSTALL) -m 644 doc/*.8 $(DESTDIR)$(mandir)/man8
 
