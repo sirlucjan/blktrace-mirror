@@ -38,6 +38,8 @@ automatically push the keys under the graph.
 To exit the plotter, enter 'quit' or ^D at the 'gnuplot> ' prompt.
 """
 
+from __future__ import absolute_import
+from __future__ import print_function
 import getopt, glob, os, sys, tempfile
 
 verbose	= 0
@@ -60,14 +62,14 @@ def parse_args(in_args):
 
 	try:
 		(opts, args) = getopt.getopt(in_args, s_opts, l_opts)
-	except getopt.error, msg:
-		print >>sys.stderr, msg
-		print >>sys.stderr, __doc__
+	except getopt.error as msg:
+		print(msg, file=sys.stderr)
+		print(__doc__, file=sys.stderr)
 		sys.exit(1)
 
 	for (o, a) in opts:
 		if o in ('-h', '--help'):
-			print __doc__
+			print(__doc__)
 			sys.exit(0)
 		elif o in ('-v', '--verbose'):
 			verbose += 1
@@ -84,10 +86,10 @@ if __name__ == '__main__':
 	(bnos, keys_below) = parse_args(sys.argv[1:])
 
 	if verbose:
-		print 'Using files:',
-		for bno in bnos: print bno,
-		if keys_below:	print '\nKeys are to be placed below graph'
-		else:		print ''
+		print('Using files:', end=' ')
+		for bno in bnos: print(bno, end=' ')
+		if keys_below:	print('\nKeys are to be placed below graph')
+		else:		print('')
 
 	tmpdir = tempfile.mktemp()
 	os.mkdir(tmpdir)
@@ -99,7 +101,7 @@ if __name__ == '__main__':
 		fo = open(t, 'w')
 		for line in open(f, 'r'):
 			fld = line.split(None)
-			print >>fo, fld[0], fld[1], int(fld[2])-int(fld[1])
+			print(fld[0], fld[1], int(fld[2])-int(fld[1]), file=fo)
 		fo.close()
 
 		t = t[t.rfind('/')+1:]
@@ -107,16 +109,16 @@ if __name__ == '__main__':
 		else:                plot_cmd = "%s,'%s'" % (plot_cmd, t)
 
 	fo = open('%s/plot.cmds' % tmpdir, 'w')
-	print >>fo, cmds
-	if len(bnos) > 10 or keys_below: print >>fo, 'set key below'
-	print >>fo, plot_cmd
+	print(cmds, file=fo)
+	if len(bnos) > 10 or keys_below: print('set key below', file=fo)
+	print(plot_cmd, file=fo)
 	fo.close()
 
 	pid = os.fork()
 	if pid == 0:
 		cmd = 'gnuplot %s/plot.cmds -' % tmpdir
 
-		if verbose: print 'Executing %s' % cmd
+		if verbose: print('Executing %s' % cmd)
 
 		os.chdir(tmpdir)
 		os.system(cmd)

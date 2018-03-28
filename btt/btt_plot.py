@@ -55,6 +55,10 @@ Arguments:
   but the -o (--output) and -T (--title) options will be ignored.
 """
 
+from __future__ import absolute_import
+from __future__ import print_function
+import six
+from six.moves import range
 __author__ = 'Alan D. Brunelle <alan.brunelle@hp.com>'
 
 #------------------------------------------------------------------------------
@@ -82,7 +86,7 @@ get_base 	= lambda file: file[file.find('_')+1:file.rfind('_')]
 def fatal(msg):
 	"""Generate fatal error message and exit"""
 
-	print >>sys.stderr, 'FATAL: %s' % msg
+	print('FATAL: %s' % msg, file=sys.stderr)
 	sys.exit(1)
 
 #------------------------------------------------------------------------------
@@ -163,7 +167,7 @@ def get_data(files):
 		if not os.path.exists(file):
 			fatal('%s not found' % file)
 		elif verbose:
-			print 'Processing %s' % file
+			print('Processing %s' % file)
 
 		xs = []
 		ys = []
@@ -214,8 +218,8 @@ def parse_args(args):
 
 	try:
 		(opts, args) = getopt.getopt(args[1:], s_opts, l_opts)
-	except getopt.error, msg:
-		print >>sys.stderr, msg
+	except getopt.error as msg:
+		print(msg, file=sys.stderr)
 		fatal(__doc__)
 
 	for (o, a) in opts:
@@ -293,15 +297,15 @@ def generate_output(type, db):
 	def color(idx, style):
 		"""Returns a color/symbol type based upon the index passed."""
 
-                colors = [ 'b', 'g', 'r', 'c', 'm', 'y', 'k' ]
+		colors = [ 'b', 'g', 'r', 'c', 'm', 'y', 'k' ]
 		l_styles = [ '-', ':', '--', '-.' ]
 		m_styles = [ 'o', '+', '.', ',', 's', 'v', 'x', '<', '>' ]
 
 		color = colors[idx % len(colors)]
 		if style == 'line':
-			style = l_styles[(idx / len(l_styles)) % len(l_styles)]
+			style = l_styles[int((idx / len(l_styles)) % len(l_styles))]
 		elif style == 'marker':
-			style = m_styles[(idx / len(m_styles)) % len(m_styles)]
+			style = m_styles[int((idx / len(m_styles)) % len(m_styles))]
 
 		return '%s%s' % (color, style)
 
@@ -314,7 +318,7 @@ def generate_output(type, db):
 		ofile = '%s.png' % type
 
 	if verbose:
-		print 'Generating plot into %s' % ofile
+		print('Generating plot into %s' % ofile)
 
 	fig = plt.figure(figsize=plot_size)
 	ax = fig.add_subplot(111)
@@ -329,7 +333,7 @@ def generate_output(type, db):
 		legends = None
 
 	keys = []
-	for file in db.iterkeys():
+	for file in six.iterkeys(db):
 		if not file in ['min_x', 'max_x', 'min_y', 'max_y']:
 			keys.append(file)
 
