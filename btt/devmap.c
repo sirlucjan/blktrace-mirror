@@ -23,7 +23,7 @@
 
 struct devmap {
 	struct list_head head;
-	char device[32], devno[32];
+	char device[PATH_MAX], devno[PATH_MAX];
 };
 
 LIST_HEAD(all_devmaps);
