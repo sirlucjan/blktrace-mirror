@@ -1099,16 +1099,28 @@ void add_pending_io(struct trace *trace, struct graph_line_data *gld)
 	if (action == __BLK_TA_QUEUE) {
 		if (io->sector == 0)
 			return;
-		if (trace->found_issue || trace->found_completion) {
-			pio = hash_queued_io(trace->io);
-			/*
-			 * When there are no ISSUE events count depth and
-			 * latency at least from queue events
-			 */
-			if (pio && !trace->found_issue) {
-				pio->dispatch_time = io->time;
-				goto account_io;
-			}
+		/*
+		 * If D (issue) events are available, use them for I/O
+		 * accounting.  Nothing needs to be done for Q.
+		 */
+		if (trace->found_issue)
+			return;
+		/*
+		 * If there are no D or C events, then all that can be
+		 * done is to account the Q event (and make sure not to
+		 * add the I/O to the hash, because it will never be
+		 * removed).
+		 */
+		if (!trace->found_completion)
+			goto account_io;
+		/*
+		 * When there are no ISSUE events, count depth and
+		 * latency from queue events.
+		 */
+		pio = hash_queued_io(trace->io);
+		if (pio) {
+			pio->dispatch_time = io->time;
+			goto account_io;
 		}
 		return;
 	}
