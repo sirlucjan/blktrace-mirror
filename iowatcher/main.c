@@ -1043,9 +1043,14 @@ static void system_check(const char *cmd)
 
 static void convert_movie_files(char *movie_dir)
 {
+	long nr_cpus = sysconf(_SC_NPROCESSORS_ONLN);
+
+	if (nr_cpus < 0)
+		nr_cpus = 8;
+
 	fprintf(stderr, "Converting svg files in %s\n", movie_dir);
-	snprintf(line, line_len, "find %s -name \\*.svg | xargs -I{} -n 1 -P 8 rsvg-convert -o {}.png {}",
-		 movie_dir);
+	snprintf(line, line_len, "find %s -name \\*.svg | xargs -I{} -n 1 -P %ld rsvg-convert -o {}.png {}",
+		 movie_dir, nr_cpus);
 	system_check(line);
 }
 
