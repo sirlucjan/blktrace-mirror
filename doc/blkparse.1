@@ -165,6 +165,21 @@ Quiet mode
 Displays data sorted by program
 .RE
 
+\-S \fIevent\fR
+.br
+\-\-sort\-program\-stats=\fIevent\fR
+.br
+.RS
+Displays each program's data sorted by program name or io event, like
+Queued, Read, Write and Complete. When \-S is specified the \-s will be ignored.
+The capital letters Q,R,W,C stand for KB, then q/r/w/c stand for IO.
+
+If you want to soct programs by how many data they queued, you can use:
+
+blkparse -i sda.blktrace. -q \-S Q \-o sda.parse
+.RE
+
+
 \-t
 .br
 \-\-track\-ios
