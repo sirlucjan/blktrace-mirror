@@ -2710,6 +2710,14 @@ static int do_file(void)
 		genesis_time = ms_peek_time(ms_head);
 
 	/*
+	 * Correct abs_start_time if necessary
+	 */
+	if (start_timestamp
+	 && start_timestamp != genesis_time) {
+		correct_abs_start_time();
+	}
+
+	/*
 	 * Keep processing traces while any are left
 	 */
 	while (!is_done() && ms_head && handle(ms_head))
