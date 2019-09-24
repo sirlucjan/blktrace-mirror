@@ -2022,6 +2022,22 @@ static void show_device_and_cpu_stats(void)
 	}
 }
 
+static void correct_abs_start_time(void)
+{
+	long delta = genesis_time - start_timestamp;
+
+	abs_start_time.tv_sec  += SECONDS(delta);
+	abs_start_time.tv_nsec += NANO_SECONDS(delta);
+	if (abs_start_time.tv_nsec < 0) {
+		abs_start_time.tv_nsec += 1000000000;
+		abs_start_time.tv_sec -= 1;
+	} else
+	if (abs_start_time.tv_nsec > 1000000000) {
+		abs_start_time.tv_nsec -= 1000000000;
+		abs_start_time.tv_sec += 1;
+	}
+}
+
 static void find_genesis(void)
 {
 	struct trace *t = trace_list;
@@ -2039,18 +2055,7 @@ static void find_genesis(void)
 	 */
 	if (start_timestamp
 	 && start_timestamp != genesis_time) {
-		long delta = genesis_time - start_timestamp;
-
-		abs_start_time.tv_sec  += SECONDS(delta);
-		abs_start_time.tv_nsec += NANO_SECONDS(delta);
-		if (abs_start_time.tv_nsec < 0) {
-			abs_start_time.tv_nsec += 1000000000;
-			abs_start_time.tv_sec -= 1;
-		} else
-		if (abs_start_time.tv_nsec > 1000000000) {
-			abs_start_time.tv_nsec -= 1000000000;
-			abs_start_time.tv_sec += 1;
-		}
+		correct_abs_start_time();
 	}
 }
 
