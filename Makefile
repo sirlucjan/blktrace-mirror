@@ -14,7 +14,7 @@ all: $(ALL) $(SUBDIRS)
 
 # We always descend into subdirs because they contain their own dependency
 # information which we don't track in this top level Makefile.
-$(SUBDIRS):
+$(SUBDIRS): $(PROGS)
 	$(MAKE) -C $@
 .PHONY: $(SUBDIRS)
 
