@@ -396,12 +396,11 @@ def do_live(files):
 	def live_sort(a, b):
 		if a[0] == 'sys' and b[0] == 'sys':
 			return 0
-		elif a[0] == 'sys' or a[2][0] < b[2][0]:
+		if a[0] == 'sys' or a[2][0] < b[2][0]:
 			return -1
-		elif b[0] == 'sys' or a[2][0] > b[2][0]:
+		if b[0] == 'sys' or a[2][0] > b[2][0]:
 			return  1
-		else:
-			return  0
+		return  0
 
 	#----------------------------------------------------------------------
 	def turn_off_ticks(ax):
