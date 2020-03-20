@@ -349,7 +349,7 @@ def generate_output(type, db):
 			legends.append(get_base(file))
 		idx += 1
 
-	if add_legend and len(legends) > 0:
+	if add_legend and legends:
 		gen_legends(ax, legends)
 	plt.savefig(ofile)
 
@@ -450,7 +450,7 @@ if __name__ == '__main__':
 		output_file = title_str = type = None
 		for t in types:
 			files = get_files(t)
-			if len(files) == 0:
+			if files == 0:
 				continue
 			elif t == 'bnos':
 				do_bnos(files)
@@ -460,7 +460,7 @@ if __name__ == '__main__':
 				generate_output(t, get_data(files))
 				continue
 
-	elif len(files) < 1:
+	elif not files:
 		fatal('Need data files to process')
 	else:
 		generate_output(type, get_data(files))
