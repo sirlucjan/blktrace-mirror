@@ -125,10 +125,7 @@ def get_data(files):
 		def _avg(vals):
 			"""Computes average for array of values passed"""
 
-			total = 0.0
-			for val in vals:
-				total += val
-			return total / len(vals)
+			return sum(vals) / len(vals)
 
 		#------------------------------------------------------
 		if len(xs) < 1000:
