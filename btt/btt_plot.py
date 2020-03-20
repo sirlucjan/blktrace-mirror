@@ -57,6 +57,7 @@ Arguments:
 
 from __future__ import absolute_import
 from __future__ import print_function
+import getopt, glob, os, sys
 import six
 from six.moves import range
 __author__ = 'Alan D. Brunelle <alan.brunelle@hp.com>'
@@ -65,7 +66,6 @@ __author__ = 'Alan D. Brunelle <alan.brunelle@hp.com>'
 
 import matplotlib
 matplotlib.use('Agg')
-import getopt, glob, os, sys
 import matplotlib.pyplot as plt
 
 plot_size	= [10.9, 8.4]	# inches...
