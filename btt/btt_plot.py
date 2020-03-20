@@ -168,14 +168,15 @@ def get_data(files):
 
 		xs = []
 		ys = []
-		for line in open(file, 'r'):
-			f = line.rstrip().split(None)
-			if line.find('#') == 0 or len(f) < 2:
-				continue
-			(min_x, max_x, x) = check(min_x, max_x, f[0])
-			(min_y, max_y, y) = check(min_y, max_y, f[1])
-			xs.append(x)
-			ys.append(y)
+		with open(file, 'r') as fi:
+			for line in fi:
+				f = line.rstrip().split(None)
+				if line.find('#') == 0 or len(f) < 2:
+					continue
+				(min_x, max_x, x) = check(min_x, max_x, f[0])
+				(min_y, max_y, y) = check(min_y, max_y, f[1])
+				xs.append(x)
+				ys.append(y)
 
 		db[file] = {'x':xs, 'y':ys}
 		if len(xs) > 10:
@@ -385,11 +386,12 @@ def do_live(files):
 	def get_live_data(fn):
 		xs = []
 		ys = []
-		for line in open(fn, 'r'):
-			f = line.rstrip().split()
-			if f[0] != '#' and len(f) == 2:
-				xs.append(float(f[0]))
-				ys.append(float(f[1]))
+		with open(fn, 'r') as fi:
+			for line in fi:
+				f = line.rstrip().split()
+				if f[0] != '#' and len(f) == 2:
+					xs.append(float(f[0]))
+					ys.append(float(f[1]))
 		return xs, ys
 
 	#----------------------------------------------------------------------
