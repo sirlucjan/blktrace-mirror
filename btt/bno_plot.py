@@ -76,7 +76,7 @@ def parse_args(in_args):
 		elif o in ('-K', '--keys-below'):
 			keys_below = True
 
-	if len(args) > 0:	bnos = args
+	if args:	bnos = args
 	else:			bnos = glob.glob('blknos*[rw].dat')
 
 	return (bnos, keys_below)
