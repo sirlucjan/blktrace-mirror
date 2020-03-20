@@ -105,7 +105,7 @@ if __name__ == '__main__':
 					print(fld[0], fld[1], int(fld[2])-int(fld[1]), file=fo)
 
 		t = t[t.rfind('/')+1:]
-		if plot_cmd == None: plot_cmd = "splot '%s'" % t
+		if plot_cmd is None: plot_cmd = "splot '%s'" % t
 		else:                plot_cmd = "%s,'%s'" % (plot_cmd, t)
 
 	with open('%s/plot.cmds' % tmpdir, 'w') as fo:
