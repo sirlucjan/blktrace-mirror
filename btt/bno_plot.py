@@ -40,7 +40,7 @@ To exit the plotter, enter 'quit' or ^D at the 'gnuplot> ' prompt.
 
 from __future__ import absolute_import
 from __future__ import print_function
-import getopt, glob, os, sys, tempfile
+import getopt, glob, os, sys, tempfile, shutil
 
 verbose	= 0
 cmds	= """
@@ -125,4 +125,4 @@ if __name__ == '__main__':
 		sys.exit(1)
 
 	os.waitpid(pid, 0)
-	os.system('/bin/rm -rf ' + tmpdir)
+	shutil.rmtree(tmpdir)
