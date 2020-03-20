@@ -98,21 +98,20 @@ if __name__ == '__main__':
 	for f in bnos:
 		t = '%s/%s' % (tmpdir, f)
 
-		fo = open(t, 'w')
-		for line in open(f, 'r'):
-			fld = line.split(None)
-			print(fld[0], fld[1], int(fld[2])-int(fld[1]), file=fo)
-		fo.close()
+		with open(t, 'w') as fo:
+			with open(f, 'r') as fi:
+				for line in fi:
+					fld = line.split(None)
+					print(fld[0], fld[1], int(fld[2])-int(fld[1]), file=fo)
 
 		t = t[t.rfind('/')+1:]
 		if plot_cmd == None: plot_cmd = "splot '%s'" % t
 		else:                plot_cmd = "%s,'%s'" % (plot_cmd, t)
 
-	fo = open('%s/plot.cmds' % tmpdir, 'w')
-	print(cmds, file=fo)
-	if len(bnos) > 10 or keys_below: print('set key below', file=fo)
-	print(plot_cmd, file=fo)
-	fo.close()
+	with open('%s/plot.cmds' % tmpdir, 'w') as fo:
+		print(cmds, file=fo)
+		if len(bnos) > 10 or keys_below: print('set key below', file=fo)
+		print(plot_cmd, file=fo)
 
 	pid = os.fork()
 	if pid == 0:
