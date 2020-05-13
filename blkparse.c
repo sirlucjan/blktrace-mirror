@@ -663,7 +663,7 @@ static void handle_notify(struct blk_io_trace *bit)
 				MAJOR(bit->device), MINOR(bit->device),
 				bit->cpu, "0", (int)SECONDS(bit->time),
 				(unsigned long)NANO_SECONDS(bit->time),
-				0, cgidstr, "m", "N", msg);
+				bit->pid, cgidstr, "m", "N", msg);
 		}
 		break;
 
