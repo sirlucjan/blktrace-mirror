@@ -617,7 +617,7 @@ static void handle_notify(struct blk_io_trace *bit)
 	void	*payload = (caddr_t) bit + sizeof(*bit);
 	__u32	two32[2];
 
-	switch (bit->action) {
+	switch (bit->action & ~__BLK_TN_CGROUP) {
 	case BLK_TN_PROCESS:
 		add_ppm_hash(bit->pid, payload);
 		break;
@@ -643,16 +643,27 @@ static void handle_notify(struct blk_io_trace *bit)
 	case BLK_TN_MESSAGE:
 		if (bit->pdu_len > 0) {
 			char msg[bit->pdu_len+1];
+			int len = bit->pdu_len;
+			char cgidstr[24];
 
-			memcpy(msg, (char *)payload, bit->pdu_len);
-			msg[bit->pdu_len] = '\0';
+			cgidstr[0] = 0;
+			if (bit->action & __BLK_TN_CGROUP) {
+				struct blk_io_cgroup_payload *cgid = payload;
+
+				sprintf(cgidstr, "%x,%x ", cgid->ino,
+					cgid->gen);
+				payload += sizeof(struct blk_io_cgroup_payload);
+				len -= sizeof(struct blk_io_cgroup_payload);
+			}
+			memcpy(msg, (char *)payload, len);
+			msg[len] = '\0';
 
 			fprintf(ofp,
-				"%3d,%-3d %2d %8s %5d.%09lu %5u %2s %3s %s\n",
+				"%3d,%-3d %2d %8s %5d.%09lu %5u %s%2s %3s %s\n",
 				MAJOR(bit->device), MINOR(bit->device),
-				bit->cpu, "0", (int) SECONDS(bit->time),
-				(unsigned long) NANO_SECONDS(bit->time),
-				0, "m", "N", msg);
+				bit->cpu, "0", (int)SECONDS(bit->time),
+				(unsigned long)NANO_SECONDS(bit->time),
+				bit->pid, cgidstr, "m", "N", msg);
 		}
 		break;
 
@@ -1600,7 +1611,7 @@ static void dump_trace_pc(struct blk_io_trace *t, struct per_dev_info *pdi,
 			  struct per_cpu_info *pci)
 {
 	int w = (t->action & BLK_TC_ACT(BLK_TC_WRITE)) != 0;
-	int act = t->action & 0xffff;
+	int act = (t->action & 0xffff) & ~__BLK_TA_CGROUP;
 
 	switch (act) {
 		case __BLK_TA_QUEUE:
@@ -1649,7 +1660,7 @@ static void dump_trace_fs(struct blk_io_trace *t, struct per_dev_info *pdi,
 			  struct per_cpu_info *pci)
 {
 	int w = (t->action & BLK_TC_ACT(BLK_TC_WRITE)) != 0;
-	int act = t->action & 0xffff;
+	int act = (t->action & 0xffff) & ~__BLK_TA_CGROUP;
 
 	switch (act) {
 		case __BLK_TA_QUEUE:
@@ -1734,7 +1745,7 @@ static void dump_trace(struct blk_io_trace *t, struct per_cpu_info *pci,
 		       struct per_dev_info *pdi)
 {
 	if (text_output) {
-		if (t->action == BLK_TN_MESSAGE)
+		if ((t->action & ~__BLK_TN_CGROUP) == BLK_TN_MESSAGE)
 			handle_notify(t);
 		else if (t->action & BLK_TC_ACT(BLK_TC_PC))
 			dump_trace_pc(t, pdi, pci);
@@ -1749,7 +1760,7 @@ static void dump_trace(struct blk_io_trace *t, struct per_cpu_info *pci,
 
 	if (bin_output_msgs ||
 			    !(t->action & BLK_TC_ACT(BLK_TC_NOTIFY) &&
-			      t->action == BLK_TN_MESSAGE))
+			      (t->action & ~__BLK_TN_CGROUP) == BLK_TN_MESSAGE))
 		output_binary(t, sizeof(*t) + t->pdu_len);
 }
 
@@ -2325,7 +2336,7 @@ static void show_entries_rb(int force)
 			break;
 		}
 
-		if (!(bit->action == BLK_TN_MESSAGE) &&
+		if (!((bit->action & ~__BLK_TN_CGROUP) == BLK_TN_MESSAGE) &&
 		    check_sequence(pdi, t, force))
 			break;
 
@@ -2337,7 +2348,7 @@ static void show_entries_rb(int force)
 		if (!pci || pci->cpu != bit->cpu)
 			pci = get_cpu_info(pdi, bit->cpu);
 
-		if (!(bit->action == BLK_TN_MESSAGE))
+		if (!((bit->action & ~__BLK_TN_CGROUP) == BLK_TN_MESSAGE))
 			pci->last_sequence = bit->sequence;
 
 		pci->nelems++;
@@ -2471,7 +2482,7 @@ static int read_events(int fd, int always_block, int *fdblock)
 		/*
 		 * not a real trace, so grab and handle it here
 		 */
-		if (bit->action & BLK_TC_ACT(BLK_TC_NOTIFY) && bit->action != BLK_TN_MESSAGE) {
+		if (bit->action & BLK_TC_ACT(BLK_TC_NOTIFY) && (bit->action & ~__BLK_TN_CGROUP) != BLK_TN_MESSAGE) {
 			handle_notify(bit);
 			output_binary(bit, sizeof(*bit) + bit->pdu_len);
 			continue;
@@ -2620,7 +2631,7 @@ static int ms_prime(struct ms_stream *msp)
 			continue;
 		}
 
-		if (bit->action & BLK_TC_ACT(BLK_TC_NOTIFY) && bit->action != BLK_TN_MESSAGE) {
+		if (bit->action & BLK_TC_ACT(BLK_TC_NOTIFY) && (bit->action & ~__BLK_TN_CGROUP) != BLK_TN_MESSAGE) {
 			handle_notify(bit);
 			output_binary(bit, sizeof(*bit) + bit->pdu_len);
 			bit_free(bit);

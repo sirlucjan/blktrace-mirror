@@ -205,6 +205,21 @@ static void print_field(char *act, struct per_cpu_info *pci,
 	case 'e':
 		fprintf(ofp, strcat(format, "d"), t->error);
 		break;
+	case 'g': {
+		char cgidstr[24];
+		u32 ino = 0, gen = 0;
+
+		if (t->action & __BLK_TA_CGROUP) {
+			struct blk_io_cgroup_payload *cgid =
+				(struct blk_io_cgroup_payload *)pdu_buf;
+
+			ino = cgid->ino;
+			gen = cgid->gen;
+		}
+		sprintf(cgidstr, "%x,%x", ino, gen);
+		fprintf(ofp, strcat(format, "s"), cgidstr);
+		break;
+	}
 	case 'M':
 		fprintf(ofp, strcat(format, "d"), MAJOR(t->device));
 		break;
