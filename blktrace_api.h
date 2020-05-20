@@ -51,7 +51,6 @@ enum {
 	__BLK_TA_REMAP,			/* bio was remapped */
 	__BLK_TA_ABORT,			/* request aborted */
 	__BLK_TA_DRV_DATA,		/* binary driver data */
-	__BLK_TA_CGROUP = 1 << 8,
 };
 
 /*
@@ -61,7 +60,6 @@ enum blktrace_notify {
 	__BLK_TN_PROCESS = 0,		/* establish pid/name mapping */
 	__BLK_TN_TIMESTAMP,		/* include system clock */
 	__BLK_TN_MESSAGE,               /* Character string message */
-	__BLK_TN_CGROUP = __BLK_TA_CGROUP,
 };
 
 /*
@@ -116,14 +114,6 @@ struct blk_io_trace_remap {
 	__u32 device_from;
 	__u32 device_to;
 	__u64 sector_from;
-};
-
-/*
- * Payload with originating cgroup info
- */
-struct blk_io_cgroup_payload {
-	__u32 ino;
-	__u32 gen;
 };
 
 /*
